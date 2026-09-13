@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Happy Birthday, My Love!</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400;1,600&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-1: #12021a;
+            --bg-2: #2b0838;
+            --bg-3: #4a0f5e;
+            --gold: #ffd700;
+            --gold-light: #fff3b0;
+            --pink-glow: #ff2a8d;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 215, 0, 0.35);
+            --text-light: #ffffff;
+        }
+
+        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--bg-1), var(--bg-2), var(--bg-3));
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        h1, h2 {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--gold-light);
+            text-align: center;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.6), 0 4px 15px rgba(0,0,0,0.8);
+            margin: 8px 0;
+        }
+        h1 { font-size: clamp(2.2rem, 7vw, 3.2rem); letter-spacing: 1px; }
+
+        .glow-title {
+            animation: titlePulse 2s infinite alternate;
+        }
+        @keyframes titlePulse {
+            from { text-shadow: 0 0 10px var(--gold), 0 0 20px var(--pink-glow); }
+            to { text-shadow: 0 0 20px var(--gold), 0 0 35px var(--pink-glow), 0 0 45px #00ffff; }
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1.5px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.05);
+        }
+
+        /* --- FALLING HEARTS --- */
+        #hearts-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .heart {
+            position: absolute; top: -10vh;
+            color: rgba(255, 182, 193, 0.6);
+            animation: fall linear infinite;
+            filter: drop-shadow(0 0 6px var(--pink-glow));
+        }
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- PAGE SYSTEM --- */
+        .page {
+            display: none; position: relative; z-index: 10;
+            min-height: 100vh; padding: 15px 12px 40px 12px;
+            box-sizing: border-box; width: 100%;
+        }
+        .page.active { display: flex; flex-direction: column; align-items: center; }
+
+        /* Animations */
+        .anim-fade { animation: cinFade 0.6s ease forwards; }
+        .anim-slide { animation: cinSlide 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .anim-zoom { animation: cinZoom 0.6s ease forwards; }
+        .anim-pop { animation: cinPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; }
+
+        @keyframes cinFade { from { opacity: 0; filter: blur(10px); } to { opacity: 1; filter: blur(0); } }
+        @keyframes cinSlide { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes cinZoom { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+        @keyframes cinPop { from { opacity: 0; transform: scale(0.6) rotate(-8deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+
+        /* --- BUTTONS --- */
+        .menu-buttons {
+            display: flex; flex-direction: column; width: 100%; max-width: 420px; gap: 14px; margin-top: 20px;
+        }
+        @media(min-width: 768px) {
+            .menu-buttons { flex-direction: row; flex-wrap: wrap; max-width: 850px; justify-content: center; }
+            .menu-btn { width: 46% !important; }
+        }
+
+        .menu-btn {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 215, 0, 0.08));
+            backdrop-filter: blur(12px);
+            color: var(--gold-light);
+            border: 1.5px solid var(--glass-border);
+            padding: 18px 20px; font-size: 1.15rem; font-weight: 700;
+            border-radius: 30px; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4), 0 0 12px rgba(255, 215, 0, 0.15);
+            width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px;
+        }
+        .menu-btn:active, .menu-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 42, 141, 0.3));
+            border-color: var(--gold);
+            box-shadow: 0 10px 28px rgba(255, 215, 0, 0.4), 0 0 20px var(--pink-glow);
+        }
+
+        .back-btn {
+            align-self: flex-start;
+            background: rgba(0,0,0,0.4); color: var(--gold);
+            border: 1.5px solid var(--gold); padding: 10px 22px;
+            border-radius: 25px; cursor: pointer; font-size: 0.95rem; font-weight: 700;
+            margin-bottom: 12px; transition: 0.2s;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+        .back-btn:active { transform: scale(0.92); }
+
+        /* --- PAGE 1: 3D MEMORY FLIP CARDS --- */
+        .collage-wrapper {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; max-width: 750px;
+        }
+        @media(min-width: 600px) { .collage-wrapper { grid-template-columns: repeat(3, 1fr); } }
+
+        .flip-card {
+            background-color: transparent; height: 130px; perspective: 1000px; cursor: pointer;
+        }
+        .flip-card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d; border-radius: 16px;
+        }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-front, .flip-back {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            border-radius: 16px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: 12px;
+            border: 1.5px solid var(--glass-border);
+        }
+        .flip-front { background: var(--glass-bg); color: var(--gold-light); font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .flip-back {
+            background: linear-gradient(135deg, var(--bg-3), var(--bg-2));
+            color: #fff; transform: rotateY(180deg); border-color: var(--gold);
+            font-size: 0.9rem; line-height: 1.4; font-weight: 600;
+            box-shadow: 0 0 15px rgba(255,215,0,0.3);
+        }
+        .video-card { grid-column: span 2; height: 180px; }
+
+        /* --- PAGE 2: REASONS WHEEL & YOUTUBE --- */
+        .p2-container { display: flex; flex-direction: column; gap: 18px; width: 100%; max-width: 800px; }
+        .wheel-box { text-align: center; padding: 20px 15px; }
+        .wheel-display {
+            font-size: 1.25rem; font-weight: 700; color: var(--gold-light); min-height: 70px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.4); border-radius: 16px; padding: 12px; margin: 15px 0;
+            border: 1.5px dashed var(--gold); box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
+        }
+        .spin-btn {
+            background: linear-gradient(135deg, var(--gold), #ffaa00); color: var(--bg-1); border: none; padding: 14px 35px;
+            border-radius: 30px; font-weight: 800; cursor: pointer; font-size: 1.1rem;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4); transition: 0.2s;
+        }
+        .spin-btn:active { transform: scale(0.95); }
+
+        /* --- PAGE 3: BUBBLE POEM --- */
+        .poem-area {
+            position: relative; width: 100%; max-width: 600px; min-height: 380px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .poem-bubble {
+            width: 75px; height: 75px; border-radius: 50%; background: rgba(255, 42, 141, 0.25);
+            border: 2px solid var(--pink-glow); display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; cursor: pointer; animation: floatBubble 3.5s ease-in-out infinite alternate;
+            box-shadow: 0 0 20px rgba(255, 42, 141, 0.6); margin: 8px;
+        }
+        @keyframes floatBubble {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(-18px) scale(1.1); }
+        }
+        .revealed-poem {
+            width: 100%; padding: 22px; text-align: center; font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem; line-height: 1.8; color: var(--gold-light);
+        }
+
+        /* --- PAGE 4: CANVAS & STICKERS --- */
+        .paint-box { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 10px; width: 100%; margin-bottom: 10px; }
+        .tool-item {
+            padding: 8px 14px; border-radius: 12px; background: rgba(255,255,255,0.12);
+            border: 1px solid var(--glass-border); color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+        }
+        .tool-item.active { background: var(--gold); color: var(--bg-1); font-weight: 800; box-shadow: 0 0 10px var(--gold); }
+        #paintCanvas { background: #ffffff; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); touch-action: none; width: 100%; max-width: 360px; height: 380px; }
+
+        /* --- PAGE 5: BIRTHDAY ARCADE GAME --- */
+        .game-container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 440px; }
+        .game-stats {
+            display: flex; justify-content: space-between; width: 100%; padding: 12px 16px;
+            font-weight: 800; color: var(--gold-light); font-size: 0.85rem; margin-bottom: 8px;
+        }
+        #gameCanvas {
+            background: linear-gradient(to bottom, #0f0217, #240630);
+            border: 2.5px solid var(--gold); border-radius: 20px; width: 100%; max-width: 400px; height: 350px;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.25); touch-action: none;
+        }
+        .shop-box { width: 100%; margin-top: 12px; padding: 12px; }
+        .shop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+        .shop-item {
+            background: rgba(0,0,0,0.4); border: 1.5px solid var(--glass-border); padding: 8px 5px;
+            border-radius: 14px; text-align: center; font-size: 0.75rem; font-weight: 700;
+        }
+        .shop-item button {
+            background: linear-gradient(135deg, var(--gold), #ffaa00); color: var(--bg-1); border: none; padding: 6px 4px;
+            border-radius: 12px; font-weight: 800; margin-top: 6px; cursor: pointer; width: 100%; font-size: 0.8rem;
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);
+        }
+        .shop-item button:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+        /* VICTORY STORY MODAL (2 MILLION POINTS) */
+        .story-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(8, 1, 12, 0.96); z-index: 2000; padding: 25px 15px;
+            overflow-y: auto; box-sizing: border-box; flex-direction: column; align-items: center;
+        }
+        .story-content {
+            max-width: 680px; font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem; line-height: 1.9; color: var(--gold-light); text-align: center;
+            padding: 25px 20px; border: 2px solid var(--gold); border-radius: 24px;
+            background: linear-gradient(135deg, rgba(35,5,45,0.95), rgba(75,12,95,0.95));
+            box-shadow: 0 0 60px rgba(255,215,0,0.4), 0 0 30px var(--pink-glow);
+        }
+
+        /* Celebration Confetti Canvas overlay */
+        #confettiCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 3000;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Floating Hearts Background -->
+    <div id="hearts-container"></div>
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- MAIN MENU PAGE -->
+    <div id="menu" class="page active anim-fade">
+        <div style="margin-top: 4vh; text-align: center;">
+            <h1 class="glow-title">Happy Birthday, My Wife ❤️</h1>
+            <p style="color: var(--gold-light); opacity: 0.95; font-style: italic; font-weight: 600;">Tap any gift to explore our magical space!</p>
+        </div>
+        
+        <div class="menu-buttons">
+            <button class="menu-btn" onclick="openPage('page1')">📸 Our Memories</button>
+            <button class="menu-btn" onclick="openPage('page2')">🎵 Reminds Me Of You</button>
+            <button class="menu-btn" onclick="openPage('page3')">📜 Poem For You</button>
+            <button class="menu-btn" onclick="openPage('page4')">🖌️ The Canvas</button>
+            <button class="menu-btn" onclick="openPage('page5')" style="border-color: var(--gold); background: linear-gradient(135deg, rgba(255,215,0,0.25), rgba(255,42,141,0.25)); box-shadow: 0 0 20px rgba(255,215,0,0.4);">🎮 Birthday Arcade</button>
+        </div>
+    </div>
+
+    <!-- PAGE 1: OUR MEMORIES -->
+    <div id="page1" class="page">
+        <button class="back-btn" onclick="openPage('menu')">← Menu</button>
+        <h1>I Love You</h1>
+        <p style="font-size: 0.85rem; color: var(--gold-light); margin-bottom: 12px; font-weight:600;">Tap cards to flip & uncover secret messages!</p>
+        
+        <div class="collage-wrapper">
+            <!-- Memory 1 -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-front" style="padding: 0; overflow: hidden;">
+                        <img src="YOUR_PHOTO_1.jpg" alt="Memory 1" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="flip-back">You make every single day brighter!</div>
+                </div>
+            </div>
+
+            <!-- Memory 2 -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-front" style="padding: 0; overflow: hidden;">
+                        <img src="YOUR_PHOTO_2.jpg" alt="Memory 2" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="flip-back">My favorite place is anywhere next to you.</div>
+                </div>
+            </div>
+
+            <!-- Memory 3 -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-front" style="padding: 0; overflow: hidden;">
+                        <img src="YOUR_PHOTO_3.jpg" alt="Memory 3" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="flip-back">Your smile is literally pure magic.</div>
+                </div>
+            </div>
+
+            <!-- Memory 4 -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-front" style="padding: 0; overflow: hidden;">
+                        <img src="YOUR_PHOTO_4.jpg" alt="Memory 4" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="flip-back">Thank you for being my best friend.</div>
+                </div>
+            </div>
+            
+            <!-- Video Card -->
+<div class="flip-card video-card" onclick="flipCard(this)">
+    <div class="flip-card-inner">
+        <div class="flip-front" style="padding: 0; overflow: hidden; border-color: var(--gold);">
+            <img src="YOUR_VIDEO_THUMBNAIL.jpg" alt="Our Video" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div class="flip-back" style="background: #000; padding: 0; position: relative;">
+            
+            <!-- Added playsinline and event.stopPropagation() to stop the glitch -->
+            <video controls playsinline onclick="event.stopPropagation()" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                <source src="YOUR_VIDEO.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            
+            <!-- Dedicated close button to flip the card back -->
+            <div onclick="flipCard(this.closest('.flip-card')); event.stopPropagation();" 
+                 style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); color: var(--gold); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; border: 1px solid var(--gold); z-index: 10;">
+                ✕
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+            <!-- Memory 5 -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-front" style="padding: 0; overflow: hidden;">
+                        <img src="YOUR_PHOTO_5.jpg" alt="Memory 5" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="flip-back">I love all our laughs together!</div>
+                </div>
+            </div>
+
+            <!-- Memory 6 -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-front" style="padding: 0; overflow: hidden;">
+                        <img src="YOUR_PHOTO_6.jpg" alt="Memory 6" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="flip-back">You inspire me every day.</div>
+                </div>
+            </div>
+
+            <!-- Memory 7 -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-front" style="padding: 0; overflow: hidden;">
+                        <img src="YOUR_PHOTO_7.jpg" alt="Memory 7" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="flip-back">To many more adventures together!</div>
+                </div>
+            </div>
+
+            <!-- Memory 8 -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-front" style="padding: 0; overflow: hidden;">
+                        <img src="YOUR_PHOTO_8.jpg" alt="Memory 8" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="flip-back">You are my whole world.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: REMINDS ME OF YOU -->
+    <div id="page2" class="page">
+        <button class="back-btn" onclick="openPage('menu')">← Menu</button>
+        <h1>Reminds Me Of You</h1>
+        
+        <div class="p2-container">
+            <div class="glass-panel wheel-box">
+                <h2>🎰 Why You're Amazing</h2>
+                <div class="wheel-display" id="reasonDisplay">Tap 'Spin' for a sweet message!</div>
+                <button class="spin-btn" onclick="spinReason()">Spin Wheel 💖</button>
+            </div>
+
+            <div class="glass-panel" style="padding: 15px; text-align: center;">
+                <h2>🎶 Our Vibe</h2>
+                <iframe style="width:100%; aspect-ratio:16/9; border-radius:14px; border:none;" src="https://www.youtube.com/embed/q4GJVOMjCC4" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 3: POEM FOR YOU -->
+    <div id="page3" class="page">
+        <button class="back-btn" onclick="openPage('menu')">← Menu</button>
+        <h1>Poem For You</h1>
+        <p style="font-size: 0.85rem; color: var(--gold-light); font-weight: 600;">Pop the heart bubbles to reveal the poem!</p>
+
+        <div class="poem-area">
+            <div id="bubbleContainer" style="display: flex; flex-wrap: wrap; justify-content: center;"></div>
+            <div class="glass-panel revealed-poem" id="poemBox" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- PAGE 4: THE CANVAS -->
+    <div id="page4" class="page">
+        <button class="back-btn" onclick="openPage('menu')">← Menu</button>
+        <h1>Create & Paint 🖌️</h1>
+
+        <div class="paint-box">
+            <div class="glass-panel toolbar">
+                <div class="tool-item active" onclick="setTool('brush', '#ff0055', this)">💖 Pink</div>
+                <div class="tool-item" onclick="setTool('brush', '#ffd700', this)">✨ Gold</div>
+                <div class="tool-item" onclick="setTool('brush', '#00ffff', this)">💎 Cyan</div>
+                <div class="tool-item" onclick="setTool('brush', '#000000', this)">🖤 Black</div>
+                <div class="tool-item" onclick="setTool('glitter', '', this)">✨ Glitter</div>
+                <div class="tool-item" onclick="setTool('stamp', '❤️', this)">Stamp ❤️</div>
+                <div class="tool-item" onclick="setTool('stamp', '👑', this)">Stamp 👑</div>
+                <div class="tool-item" onclick="setTool('stamp', '🎂', this)">Stamp 🎂</div>
+                <div class="tool-item" onclick="setTool('eraser', '', this)">🧽 Eraser</div>
+                <div class="tool-item" onclick="clearCanvas()" style="background: rgba(255,0,0,0.3);">Clear</div>
+                <div class="tool-item" onclick="downloadCanvas()" style="background: rgba(0,255,0,0.3);">💾 Save</div>
+            </div>
+
+            <canvas id="paintCanvas" width="360" height="380"></canvas>
+        </div>
+    </div>
+
+    <!-- PAGE 5: BIRTHDAY ARCADE GAME -->
+    <div id="page5" class="page">
+        <button class="back-btn" onclick="openPage('menu')">← Menu</button>
+        <h1 class="glow-title">Heart Catcher 🎮</h1>
+
+        <div class="game-container">
+            <div class="glass-panel game-stats">
+                <span>Score: <span id="gameScore" style="color:var(--gold);">0</span></span>
+                <span>Coins: 🪙<span id="gameCoins">0</span></span>
+                <span>High: <span id="gameHigh">0</span></span>
+            </div>
+
+            <!-- NEW: Restart and Reopen Letter Buttons -->
+            <div style="display: flex; gap: 10px; width: 100%; max-width: 400px; justify-content: space-between; margin-bottom: 10px;">
+                <button onclick="resetGame()" style="background: rgba(255,0,0,0.3); color: #fff; border: 1px solid red; padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer;">🔄 Restart Game</button>
+                <button id="btnReopenStory" onclick="triggerVictoryStory()" style="display: none; background: linear-gradient(135deg, var(--gold), #ffaa00); color: var(--bg-1); border: none; padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px var(--gold);">💌 Read Letter</button>
+            </div>
+
+            <canvas id="gameCanvas" width="360" height="350"></canvas>
+
+            <div class="glass-panel shop-box">
+                <h3 style="margin:0; text-align:center; color:var(--gold); font-size:0.95rem;">🛒 Arcade Shop (Reach 2 Million for Final Gift!)</h3>
+                <div class="shop-grid">
+                    <div class="shop-item">
+                        <div>Basket Lvl <span id="lvlSize">1</span></div>
+                        <button id="btnBuySize" onclick="buyUpgrade('size')">🪙<span id="costSize">20</span></button>
+                    </div>
+                    <div class="shop-item">
+                        <div>Coin Multiplier</div>
+                        <button id="btnBuyMult" onclick="buyUpgrade('mult')">🪙<span id="costMult">50</span></button>
+                    </div>
+                    <div class="shop-item">
+                        <div>Heart Magnet</div>
+                        <button id="btnBuyMag" onclick="buyUpgrade('magnet')">🪙<span id="costMag">75</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2 MILLION SCORE STORY MODAL -->
+    <div id="storyModal" class="story-modal">
+        <div class="story-content">
+            <h1 style="color: var(--gold); font-size: clamp(2.2rem, 6vw, 3rem); margin-bottom: 15px;">To My Beautiful Wife, My Everything ❤️</h1>
+            
+            <p>You did it! You reached 2 million points, but to be completely honest, 2 million isn't even close to measuring how much you truly mean to me. If every single point represented a reason why I love you, I would still be counting forever.</p>
+
+            <p>From the moment you entered my life, everything changed for the better. You brought a warmth, a joy, and a light that I never even knew I was missing. Your smile alone can turn my absolute worst days completely around, and your laugh is hands down my favorite sound in the entire world.</p>
+
+            <p>Life can be unpredictable. Times get easy, and times get hard—just like in our poem. But no matter what happens in this world, there is one thing that will never change: <strong>I love you with all my heart, and I can never, ever afford to lose you.</strong> You are my home, my best friend, my soulmate, and my entire life.</p>
+
+            <p>Thank you for choosing me every single day, for believing in us, and for making my world so incredibly beautiful. I promise to always stand by your side, to support your dreams, to hold your hand through every storm, and to cherish you every second of our lives.</p>
+
+            <p style="font-size: 1.6rem; color: var(--gold); margin-top: 25px; font-weight: bold;">Happy Birthday, my love. Forever and always, yours. 💕</p>
+
+            <button onclick="closeStory()" style="background: linear-gradient(135deg, var(--gold), #ffaa00); color: var(--bg-1); border: none; padding: 14px 35px; font-size: 1.1rem; font-weight: 800; border-radius: 30px; cursor: pointer; margin-top: 15px; box-shadow: 0 0 20px var(--gold);">Keep Playing 💖</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 'menu';
+
+        // --- AUDIO SYNTHESIZER ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSfx(freq, type='sine', duration=0.1) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e){}
+        }
+
+        // --- CONFETTI SYSTEM ---
+        function fireConfetti() {
+            const cCanvas = document.getElementById('confettiCanvas');
+            const cCtx = cCanvas.getContext('2d');
+            cCanvas.width = window.innerWidth;
+            cCanvas.height = window.innerHeight;
+
+            let particles = [];
+            for(let i=0; i<100; i++) {
+                particles.push({
+                    x: Math.random() * cCanvas.width,
+                    y: Math.random() * cCanvas.height - cCanvas.height,
+                    color: ['#ffd700','#ff2a8d','#00ffff','#ffffff','#ffaa00'][Math.floor(Math.random()*5)],
+                    size: Math.random() * 8 + 4,
+                    speedY: Math.random() * 4 + 3,
+                    speedX: Math.random() * 2 - 1
+                });
+            }
+
+            let frames = 0;
+            function renderConfetti() {
+                cCtx.clearRect(0,0,cCanvas.width,cCanvas.height);
+                particles.forEach(p => {
+                    p.y += p.speedY;
+                    p.x += p.speedX;
+                    cCtx.fillStyle = p.color;
+                    cCtx.fillRect(p.x, p.y, p.size, p.size);
+                });
+                frames++;
+                if(frames < 120) requestAnimationFrame(renderConfetti);
+                else cCtx.clearRect(0,0,cCanvas.width,cCanvas.height);
+            }
+            renderConfetti();
+        }
+
+        // --- BACKGROUND HEARTS ---
+        function generateHearts() {
+            const container = document.getElementById('hearts-container');
+            for(let i=0; i<25; i++) {
+                let h = document.createElement('div');
+                h.className = 'heart';
+                h.innerHTML = ['❤️','💖','💕','✨'][Math.floor(Math.random()*4)];
+                h.style.left = Math.random()*100 + 'vw';
+                h.style.animationDuration = (Math.random()*6 + 6) + 's';
+                h.style.animationDelay = (Math.random()*5) + 's';
+                h.style.fontSize = (Math.random()*15 + 12) + 'px';
+                container.appendChild(h);
+            }
+        }
+        generateHearts();
+
+        // --- PAGE NAVIGATION ---
+        const pageAnims = ['anim-fade', 'anim-slide', 'anim-zoom', 'anim-pop'];
+        function openPage(pageId) {
+            currentPage = pageId;
+            
+            if (pageId !== 'page5' && gameInterval) {
+                clearInterval(gameInterval);
+                gameInterval = null;
+            }
+
+            playSfx(440, 'sine', 0.08);
+            document.querySelectorAll('.page').forEach(p => {
+                p.style.display = 'none';
+                p.classList.remove('active', ...pageAnims);
+            });
+            const target = document.getElementById(pageId);
+            target.style.display = 'flex';
+            const anim = pageAnims[Math.floor(Math.random()*pageAnims.length)];
+            target.classList.add('active', anim);
+
+            if(pageId === 'page3') initPoemGame();
+            if(pageId === 'page4') initCanvas();
+            if(pageId === 'page5') startGame();
+        }
+
+        // --- PAGE 1: FLIP CARDS ---
+        function flipCard(card) {
+            playSfx(523.25, 'triangle', 0.15);
+            card.classList.toggle('flipped');
+        }
+
+        // --- PAGE 2: REASONS WHEEL ---
+        const reasons = [
+            "Your gorgeous laugh is infectious! 😁",
+            "You have the kindest heart ever. 💕",
+            "How cute you look when you're focused! 🥰",
+            "You are insanely talented & smart! 🌟",
+            "You make every bad day instantly better. ☀️",
+            "You are my rock and best friend. 💎",
+            "Your warm hugs feel like home. 🫂"
+        ];
+        function spinReason() {
+            playSfx(659.25, 'square', 0.1);
+            const display = document.getElementById('reasonDisplay');
+            let count = 0;
+            let interval = setInterval(() => {
+                display.innerText = reasons[Math.floor(Math.random()*reasons.length)];
+                count++;
+                if(count > 10) {
+                    clearInterval(interval);
+                    playSfx(880, 'sine', 0.3);
+                }
+            }, 80);
+        }
+
+        // --- PAGE 3: BUBBLE POEM ---
+        const poemLines = [
+            "Love is blue,",
+            "Love is black,",
+            "Love is easy,",
+            "Love is Hard,",
+            "But why not love you,",
+            "when Times get hard,",
+            "so you can love me when things aren't easy. ❤️"
+        ];
+        let currentLine = 0;
+        function initPoemGame() {
+            currentLine = 0;
+            const container = document.getElementById('bubbleContainer');
+            const poemBox = document.getElementById('poemBox');
+            container.innerHTML = '';
+            poemBox.innerHTML = '';
+            poemBox.style.display = 'none';
+
+            for(let i=0; i<poemLines.length; i++) {
+                let b = document.createElement('div');
+                b.className = 'poem-bubble';
+                b.innerHTML = '💖';
+                b.onclick = function() {
+                    playSfx(783.99, 'sine', 0.2);
+                    this.remove();
+                    poemBox.style.display = 'block';
+                    poemBox.innerHTML += `<p style="margin:6px 0;">${poemLines[currentLine]}</p>`;
+                    currentLine++;
+                };
+                container.appendChild(b);
+            }
+        }
+
+        // --- PAGE 4: CANVAS & DRAWING ---
+        let canvas, ctx, drawing = false;
+        let currentTool = 'brush', currentColor = '#ff0055';
+
+        function initCanvas() {
+            canvas = document.getElementById('paintCanvas');
+            ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                return {
+                    x: ((e.clientX || (e.touches && e.touches[0].clientX)) - rect.left) * (canvas.width / rect.width),
+                    y: ((e.clientY || (e.touches && e.touches[0].clientY)) - rect.top) * (canvas.height / rect.height)
+                };
+            };
+
+            canvas.onmousedown = canvas.ontouchstart = (e) => { drawing = true; draw(e, getPos(e)); };
+            canvas.onmouseup = canvas.ontouchend = () => { drawing = false; ctx.beginPath(); };
+            canvas.onmousemove = canvas.ontouchmove = (e) => { draw(e, getPos(e)); };
+        }
+
+        function setTool(tool, color, el) {
+            playSfx(587.33, 'sine', 0.08);
+            currentTool = tool;
+            if(color) currentColor = color;
+            document.querySelectorAll('.tool-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function draw(e, pos) {
+            if(!drawing) return;
+            e.preventDefault();
+
+            if(currentTool === 'stamp') {
+                ctx.font = '30px serif';
+                ctx.fillText(currentColor, pos.x - 15, pos.y + 10);
+                drawing = false;
+            } else if(currentTool === 'glitter') {
+                for(let i=0; i<5; i++) {
+                    ctx.fillStyle = ['#ffd700','#ff2a8d','#00ffff'][Math.floor(Math.random()*3)];
+                    ctx.fillRect(pos.x + Math.random()*20 - 10, pos.y + Math.random()*20 - 10, 3, 3);
+                }
+            } else {
+                ctx.lineWidth = currentTool === 'eraser' ? 22 : 4;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = currentTool === 'eraser' ? '#ffffff' : currentColor;
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+            }
+        }
+
+        function clearCanvas() { ctx.fillRect(0,0,canvas.width,canvas.height); }
+        function downloadCanvas() {
+            const link = document.createElement('a');
+            link.download = 'birthday-drawing.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // --- PAGE 5: BIRTHDAY ARCADE GAME (REBALANCED + BUTTONS) ---
+        let gCanvas, gCtx, gameInterval = null;
+        let score = 0, coins = 0, highScore = 0;
+        let player = { x: 150, y: 300, width: 60, height: 20 };
+        let items = [];
+        let upgrades = { sizeLvl: 1, mult: 1, magnet: false };
+        let storyUnlocked = false;
+
+        function loadGameData() {
+            try {
+                const saved = localStorage.getItem('bday_game_save');
+                if(saved) {
+                    const data = JSON.parse(saved);
+                    coins = Number(data.coins) || 0;
+                    highScore = Number(data.highScore) || 0;
+                    score = Number(data.score) || 0;
+                    if(data.upgrades) {
+                        upgrades.sizeLvl = Number(data.upgrades.sizeLvl) || 1;
+                        upgrades.mult = Number(data.upgrades.mult) || 1;
+                        upgrades.magnet = Boolean(data.upgrades.magnet) || false;
+                    }
+                    storyUnlocked = Boolean(data.storyUnlocked) || false;
+                }
+            } catch(e) {
+                score = 0; coins = 0; highScore = 0;
+            }
+            updateGameUI();
+        }
+
+        function saveGameData() {
+            localStorage.setItem('bday_game_save', JSON.stringify({
+                coins: coins,
+                highScore: highScore,
+                score: score,
+                upgrades: upgrades,
+                storyUnlocked: storyUnlocked
+            }));
+            updateGameUI();
+        }
+
+        function updateGameUI() {
+            document.getElementById('gameScore').innerText = Math.floor(score).toLocaleString();
+            document.getElementById('gameCoins').innerText = Math.floor(coins).toLocaleString();
+            document.getElementById('gameHigh').innerText = Math.floor(highScore).toLocaleString();
+            document.getElementById('lvlSize').innerText = upgrades.sizeLvl;
+            document.getElementById('costSize').innerText = upgrades.sizeLvl * 20;
+            document.getElementById('costMult').innerText = upgrades.mult === 2 ? 'MAX' : 50;
+            document.getElementById('costMag').innerText = upgrades.magnet ? 'MAX' : 75;
+            document.getElementById('btnBuyMult').disabled = upgrades.mult === 2;
+            document.getElementById('btnBuyMag').disabled = upgrades.magnet;
+            player.width = 50 + (upgrades.sizeLvl * 12);
+
+            // Show the letter button if she has unlocked it
+            const btnStory = document.getElementById('btnReopenStory');
+            if(storyUnlocked) {
+                btnStory.style.display = 'block';
+            } else {
+                btnStory.style.display = 'none';
+            }
+        }
+
+        function resetGame() {
+            if(confirm("Are you sure you want to restart your game progress? (Your high score and unlocked letter will be saved!)")) {
+                score = 0;
+                coins = 0;
+                upgrades = { sizeLvl: 1, mult: 1, magnet: false };
+                items = [];
+                saveGameData();
+                updateGameUI();
+            }
+        }
+
+        function startGame() {
+            gCanvas = document.getElementById('gameCanvas');
+            gCtx = gCanvas.getContext('2d');
+            loadGameData();
+            items = [];
+
+            const moveBasket = (e) => {
+                if(currentPage !== 'page5') return;
+                const rect = gCanvas.getBoundingClientRect();
+                const clientX = (e.clientX || (e.touches && e.touches[0].clientX));
+                const x = (clientX - rect.left) * (gCanvas.width / rect.width);
+                player.x = x - player.width / 2;
+            };
+
+            gCanvas.ontouchmove = gCanvas.onmousemove = moveBasket;
+
+            if(gameInterval) clearInterval(gameInterval);
+            gameInterval = setInterval(gameLoop, 1000/30);
+        }
+
+        function gameLoop() {
+            if (currentPage !== 'page5') {
+                if(gameInterval) { clearInterval(gameInterval); gameInterval = null; }
+                return;
+            }
+
+            gCtx.clearRect(0,0,gCanvas.width,gCanvas.height);
+
+            // Draw Player Basket with Neon Glow
+            gCtx.shadowBlur = 10;
+            gCtx.shadowColor = '#ffd700';
+            gCtx.fillStyle = '#ffd700';
+            gCtx.fillRect(player.x, player.y, player.width, player.height);
+            gCtx.shadowBlur = 0;
+            gCtx.font = '14px sans-serif';
+            gCtx.fillText('🧺', player.x + player.width/2 - 7, player.y + 15);
+
+            // Spawn Items (Rebalanced to be a little harder!)
+            if(Math.random() < 0.15) {
+                const types = [
+                    { icon: '❤️', pts: 15000, coin: 2 },
+                    { icon: '❤️', pts: 15000, coin: 2 },
+                    { icon: '🎂', pts: 40000, coin: 5 },
+                    { icon: '⭐', pts: 80000, coin: 8 },
+                    { icon: '👑', pts: 200000, coin: 15 },
+                    { icon: '🌩️', pts: -35000, coin: 0 },
+                    { icon: '🌩️', pts: -35000, coin: 0 }
+                ];
+                const t = types[Math.floor(Math.random()*types.length)];
+                items.push({ x: Math.random()*(gCanvas.width-30), y: 0, speed: Math.random()*4.5 + 4, ...t });
+            }
+
+            // Update & Draw Items
+            for(let i = items.length - 1; i >= 0; i--) {
+                let item = items[i];
+                item.y += item.speed;
+
+                // Magnet Powerup Effect
+                if(upgrades.magnet && item.pts > 0 && item.y > 100) {
+                    if(item.x < player.x + player.width/2) item.x += 2.5;
+                    else item.x -= 2.5;
+                }
+
+                gCtx.font = '22px serif';
+                gCtx.fillText(item.icon, item.x, item.y);
+
+                // Collision Detection
+                if(item.y >= player.y - 10 && item.y <= player.y + player.height && item.x >= player.x - 12 && item.x <= player.x + player.width) {
+                    
+                    if (currentPage === 'page5') {
+                        playSfx(item.pts > 0 ? 880 : 220, 'triangle', 0.1);
+                    }
+
+                    score += item.pts;
+                    if(score < 0) score = 0;
+                    coins += item.coin * upgrades.mult;
+                    if(score > highScore) highScore = score;
+                    
+                    // TRIGGER 2 MILLION VICTORY STORY
+                    if(score >= 2000000 && !storyUnlocked) {
+                        storyUnlocked = true;
+                        triggerVictoryStory();
+                    }
+
+                    saveGameData();
+                    items.splice(i, 1);
+                } else if(item.y > gCanvas.height) {
+                    items.splice(i, 1);
+                }
+            }
+        }
+
+        function triggerVictoryStory() {
+            fireConfetti();
+            document.getElementById('storyModal').style.display = 'flex';
+            playSfx(1000, 'sine', 0.5);
+        }
+
+        function closeStory() {
+            document.getElementById('storyModal').style.display = 'none';
+        }
+
+        function buyUpgrade(type) {
+            if(type === 'size' && coins >= upgrades.sizeLvl * 20) {
+                coins -= upgrades.sizeLvl * 20;
+                upgrades.sizeLvl++;
+                playSfx(1000, 'sine', 0.3);
+                fireConfetti();
+                saveGameData();
+            } else if(type === 'mult' && coins >= 50 && upgrades.mult === 1) {
+                coins -= 50;
+                upgrades.mult = 2;
+                playSfx(1200, 'sine', 0.3);
+                fireConfetti();
+                saveGameData();
+            } else if(type === 'magnet' && coins >= 75 && !upgrades.magnet) {
+                coins -= 75;
+                upgrades.magnet = true;
+                playSfx(1400, 'sine', 0.3);
+                fireConfetti();
+                saveGameData();
+            }
+        }
+    </script>
+</body>
+</html>
